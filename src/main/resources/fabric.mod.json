@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "waxedicons",
+  "version": "${version}",
+  "name": "WaxedIcons",
+  "description": "This mod adds a waxed icon to waxed blocks",
+  "authors": ["Fanya__"],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/waxedicons/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.fanya.waxedicons.WaxediconsClient"
+    ]
+  },
+  "mixins": [
+    "waxedicons.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": ">=${minecraft_version}"
+  }
+}
