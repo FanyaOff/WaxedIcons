@@ -1,3 +1,0 @@
-/give Player944 minecraft:waxed_copper_block
-/give Player674 minecraft:diamond_sword
-/give Player69 minecraft:diamond_sword
