@@ -28,8 +28,8 @@ public class InGameHudMixin {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = client.player.getInventory().getStack(i);
             if (WaxedBlocks.WAXED_BLOCKS.contains(stack.getItem())) {
-                int x = client.getWindow().getScaledWidth() / 2 - 88 + i * 20; // Центрируем на хотбар
-                int y = client.getWindow().getScaledHeight() - 19; // Над хотбаром
+                int x = client.getWindow().getScaledWidth() / 2 - 88 + i * 20;
+                int y = client.getWindow().getScaledHeight() - 19;
                 renderWaxedIcon(context, x, y);
             }
         }

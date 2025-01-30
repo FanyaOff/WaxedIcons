@@ -28,6 +28,7 @@ public class CreativeInventoryScreenMixin {
     @Unique
     private void renderIconsForItems(DrawContext context) {
         CreativeInventoryScreen screen = (CreativeInventoryScreen) (Object) this;
+
         int guiLeft = (screen.width - 195) / 2;
         int guiTop = (screen.height - 136) / 2;
 
