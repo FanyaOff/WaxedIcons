@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/WaxedIcons.main.iml" filepath="$PROJECT_DIR$/.idea/modules/WaxedIcons.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/WaxedIcons.test.iml" filepath="$PROJECT_DIR$/.idea/modules/WaxedIcons.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.fanya.WaxedIcons.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.fanya.WaxedIcons.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.fanya.WaxedIcons.test.iml" filepath="$PROJECT_DIR$/.idea/modules/com.fanya.WaxedIcons.test.iml" />
     </modules>
   </component>
 </project>

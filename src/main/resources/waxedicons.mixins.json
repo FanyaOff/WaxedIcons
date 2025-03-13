@@ -5,9 +5,15 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "CreativeInventoryScreenMixin",
+    "DrawContextMixin",
+    "HandledScreenAccessor",
     "HandledScreenMixin",
     "InGameHudMixin",
-    "InventoryScreenMixin"
+    "InventoryScreenMixin",
+    "RecipeBookScreenMixin",
+    "RecipeBookWidgetAccessor",
+    "RecipeBookWidgetMixin",
+    "StonecutterScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

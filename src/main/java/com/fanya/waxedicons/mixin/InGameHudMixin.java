@@ -8,13 +8,10 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Function;
 
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
@@ -30,16 +27,18 @@ public class InGameHudMixin {
             if (WaxedBlocks.WAXED_BLOCKS.contains(stack.getItem())) {
                 int x = client.getWindow().getScaledWidth() / 2 - 88 + i * 20;
                 int y = client.getWindow().getScaledHeight() - 19;
-                renderWaxedIcon(context, x, y);
+
+                RenderSystem.enableBlend();
+                RenderSystem.setShaderTexture(0, WaxedBlocks.CUSTOM_ICON);
+
+                context.getMatrices().push();
+                context.getMatrices().translate(0, 0, 300);
+                context.drawTexture(id -> RenderLayer.getGuiTextured(WaxedBlocks.CUSTOM_ICON),
+                        WaxedBlocks.CUSTOM_ICON, x, y, 0, 0, 6, 6, 6, 6);
+                context.getMatrices().pop();
+
+                RenderSystem.disableBlend();
             }
         }
-    }
-
-    private void renderWaxedIcon(DrawContext context, int x, int y) {
-        RenderSystem.setShaderTexture(0, WaxedBlocks.CUSTOM_ICON);
-        context.getMatrices().push();
-        context.getMatrices().translate(x, y, 300);
-        context.drawTexture(id -> RenderLayer.getGuiTextured(WaxedBlocks.CUSTOM_ICON), WaxedBlocks.CUSTOM_ICON, 0, 0, 0, 0, 6, 6, 6, 6);
-        context.getMatrices().pop();
     }
 }
