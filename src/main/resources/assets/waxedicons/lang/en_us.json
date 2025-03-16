@@ -1,0 +1,11 @@
+{
+  "title.waxedicons.config": "WaxedIcons Settings",
+  "category.waxedicons.general": "General",
+  "category.waxedicons": "WaxedIcons",
+  "option.waxedicons.icon_style": "Icon Style",
+  "description.waxedicons.click_to_select": "Select a style from the dropdown menu above, then click Save to apply it.",
+  "preview.waxedicons.title": "Available Styles Preview",
+  "tooltip.waxedicons.icon_style": "Choose the style of the waxed block icon",
+  "tooltip.waxedicons.preview": "These are all available icon styles",
+  "key.waxedicons.config": "Open WaxedIcons Settings"
+}

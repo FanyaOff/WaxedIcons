@@ -1,0 +1,11 @@
+{
+  "title.waxedicons.config": "Настройки WaxedIcons",
+  "category.waxedicons.general": "Общие",
+  "category.waxedicons": "WaxedIcons",
+  "option.waxedicons.icon_style": "Стиль значка",
+  "description.waxedicons.click_to_select": "Выберите стиль из выпадающего списка выше, затем нажмите «Сохранить», чтобы применить его.",
+  "preview.waxedicons.title": "Предварительный просмотр доступных стилей",
+  "tooltip.waxedicons.icon_style": "Выберите стиль значка вощеного блока",
+  "tooltip.waxedicons.preview": "Это все доступные стили значков",
+  "key.waxedicons.config": "Открыть настройки WaxedIcons"
+}

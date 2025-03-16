@@ -8,6 +8,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin {
@@ -31,13 +33,14 @@ public abstract class HandledScreenMixin {
     @Inject(method = "drawSlots", at = @At("TAIL"))
     public void onDrawSlots(DrawContext context, CallbackInfo ci) {
         HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
-
+        Identifier iconTexture = WaxedBlocks.getCustomIcon();
+        int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
         if (!isAllowedScreen(screen)) {
             return;
         }
 
         RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, WaxedBlocks.CUSTOM_ICON);
+        RenderSystem.setShaderTexture(0, iconTexture);
 
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
@@ -47,8 +50,8 @@ public abstract class HandledScreenMixin {
 
                 context.getMatrices().push();
                 context.getMatrices().translate(0, 0, 300);
-                context.drawTexture(id -> RenderLayer.getGuiTextured(WaxedBlocks.CUSTOM_ICON),
-                        WaxedBlocks.CUSTOM_ICON, slotX, slotY, 0, 0, 6, 6, 6, 6);
+                context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
+                        iconTexture, slotX, slotY, 0, 0, size, size, size, size);
                 context.getMatrices().pop();
             }
         }

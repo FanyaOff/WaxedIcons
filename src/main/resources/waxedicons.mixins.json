@@ -10,9 +10,6 @@
     "HandledScreenMixin",
     "InGameHudMixin",
     "InventoryScreenMixin",
-    "RecipeBookScreenMixin",
-    "RecipeBookWidgetAccessor",
-    "RecipeBookWidgetMixin",
     "StonecutterScreenMixin"
   ],
   "injectors": {

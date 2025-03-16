@@ -1,5 +1,6 @@
 package com.fanya.waxedicons.util;
 
+import com.fanya.waxedicons.config.WaxedIconsConfigManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
@@ -9,7 +10,10 @@ import java.util.Set;
 
 public class WaxedBlocks {
     public static final Set<Item> WAXED_BLOCKS = new HashSet<>();
-    public static final Identifier CUSTOM_ICON = Identifier.of("waxedicons", "textures/gui/waxed_icon.png");
+
+    public static Identifier getCustomIcon() {
+        return WaxedIconsConfigManager.getIconTexture();
+    }
 
     public static void init(){
         WAXED_BLOCKS.add(Items.WAXED_COPPER_BLOCK);

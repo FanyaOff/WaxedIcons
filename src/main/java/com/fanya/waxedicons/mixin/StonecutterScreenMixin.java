@@ -8,76 +8,58 @@ import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.display.CuttingRecipeDisplay;
+import net.minecraft.recipe.display.SlotDisplay;
 import net.minecraft.recipe.display.SlotDisplayContexts;
 import net.minecraft.screen.StonecutterScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.context.ContextParameterMap;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
+
 @Mixin(StonecutterScreen.class)
 public class StonecutterScreenMixin {
 
-    @Inject(method = "render", at = @At("TAIL"))
-    public void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    @Shadow
+    private int scrollOffset;
+
+    @Inject(method = "renderRecipeIcons", at = @At("TAIL"))
+    private void onRenderRecipeIcons(DrawContext context, int x, int y, int scrollOffset, CallbackInfo ci) {
         StonecutterScreen screen = (StonecutterScreen) (Object) this;
         StonecutterScreenHandler handler = screen.getScreenHandler();
-        MinecraftClient client = MinecraftClient.getInstance();
 
-        int backgroundWidth = 176;
-        int backgroundHeight = 166;
-        int guiLeft = (screen.width - backgroundWidth) / 2;
-        int guiTop = (screen.height - backgroundHeight) / 2;
+        CuttingRecipeDisplay.Grouping<?> grouping = handler.getAvailableRecipes();
+        assert MinecraftClient.getInstance().world != null;
+        ContextParameterMap contextParameterMap = SlotDisplayContexts.createParameters(MinecraftClient.getInstance().world);
 
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, WaxedBlocks.CUSTOM_ICON);
+        Identifier iconTexture = WaxedBlocks.getCustomIcon();
+        int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
 
-        // Отрисовка иконок для слотов с предметами
-        for (Slot slot : handler.slots) {
-            ItemStack stack = slot.getStack();
-            if (WaxedBlocks.WAXED_BLOCKS.contains(stack.getItem())) {
-                int slotX = guiLeft + slot.x;
-                int slotY = guiTop + slot.y;
+        for (int i = this.scrollOffset; i < scrollOffset && i < grouping.size(); ++i) {
+            int j = i - this.scrollOffset;
+            int k = x + j % 4 * 16;
+            int l = j / 4;
+            int m = y + l * 18 + 2;
+
+            SlotDisplay slotDisplay = ((CuttingRecipeDisplay.GroupEntry<?>) grouping.entries().get(i)).recipe().optionDisplay();
+            ItemStack resultStack = slotDisplay.getFirst(contextParameterMap);
+
+            if (WaxedBlocks.WAXED_BLOCKS.contains(resultStack.getItem())) {
+                RenderSystem.enableBlend();
+                RenderSystem.setShaderTexture(0, iconTexture);
 
                 context.getMatrices().push();
                 context.getMatrices().translate(0, 0, 300);
-                context.drawTexture(id -> RenderLayer.getGuiTextured(WaxedBlocks.CUSTOM_ICON),
-                        WaxedBlocks.CUSTOM_ICON, slotX, slotY, 0, 0, 6, 6, 6, 6);
+                context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
+                        iconTexture, k, m, 0, 0, size, size, size, size);
                 context.getMatrices().pop();
+
+                RenderSystem.disableBlend();
             }
         }
-
-        // Отрисовка иконок для результатов каменореза
-        if (handler.getAvailableRecipeCount() > 0) {
-            CuttingRecipeDisplay.Grouping<?> grouping = handler.getAvailableRecipes();
-            ContextParameterMap contextParameterMap = SlotDisplayContexts.createParameters(client.world);
-
-            // Проверяем, содержат ли рецепты покрытые воском блоки
-            boolean hasWaxedResult = false;
-            ItemStack outputStack = handler.getSlot(StonecutterScreenHandler.OUTPUT_ID).getStack();
-            if (WaxedBlocks.WAXED_BLOCKS.contains(outputStack.getItem())) {
-                hasWaxedResult = true;
-            }
-
-            if (hasWaxedResult) {
-                // Отрисовка иконок в списке рецептов
-                for (int i = 0; i < handler.getAvailableRecipeCount() && i < grouping.size(); i++) {
-                    int column = i % 4;
-                    int row = i / 4;
-                    int recipeX = guiLeft + 52 + column * 16;
-                    int recipeY = guiTop + 14 + row * 18 + 2;
-
-                    context.getMatrices().push();
-                    context.getMatrices().translate(0, 0, 300);
-                    context.drawTexture(id -> RenderLayer.getGuiTextured(WaxedBlocks.CUSTOM_ICON),
-                            WaxedBlocks.CUSTOM_ICON, recipeX, recipeY, 0, 0, 6, 6, 6, 6);
-                    context.getMatrices().pop();
-                }
-            }
-        }
-
-        RenderSystem.disableBlend();
     }
 }

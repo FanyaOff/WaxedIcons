@@ -12,6 +12,9 @@
   "entrypoints": {
     "client": [
       "com.fanya.waxedicons.WaxediconsClient"
+    ],
+    "modmenu": [
+      "com.fanya.waxedicons.config.ModMenuIntegration"
     ]
   },
   "mixins": [
