@@ -2,6 +2,7 @@ package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
@@ -49,8 +50,8 @@ public class StonecutterScreenMixin {
             ItemStack resultStack = slotDisplay.getFirst(contextParameterMap);
 
             if (WaxedBlocks.WAXED_BLOCKS.contains(resultStack.getItem())) {
-                RenderSystem.enableBlend();
-                RenderSystem.setShaderTexture(0, iconTexture);
+                GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+                RenderSystem.setShaderTexture(0, gpuTexture);
 
                 context.getMatrices().push();
                 context.getMatrices().translate(0, 0, 300);
@@ -58,7 +59,6 @@ public class StonecutterScreenMixin {
                         iconTexture, k, m, 0, 0, size, size, size, size);
                 context.getMatrices().pop();
 
-                RenderSystem.disableBlend();
             }
         }
     }

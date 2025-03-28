@@ -2,6 +2,8 @@ package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -39,8 +41,8 @@ public abstract class HandledScreenMixin {
             return;
         }
 
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, iconTexture);
+        GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+        RenderSystem.setShaderTexture(0, gpuTexture);
 
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
@@ -56,7 +58,6 @@ public abstract class HandledScreenMixin {
             }
         }
 
-        RenderSystem.disableBlend();
     }
 
     @Unique

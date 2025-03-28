@@ -2,6 +2,7 @@ package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -35,8 +36,8 @@ public class InGameHudMixin {
                 int x = client.getWindow().getScaledWidth() / 2 - 88 + i * 20;
                 int y = client.getWindow().getScaledHeight() - 19;
 
-                RenderSystem.enableBlend();
-                RenderSystem.setShaderTexture(0, iconTexture);
+                GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+                RenderSystem.setShaderTexture(0, gpuTexture);
 
                 context.getMatrices().push();
                 context.getMatrices().translate(0, 0, 300);
@@ -44,7 +45,6 @@ public class InGameHudMixin {
                         iconTexture, x, y, 0, 0, size, size, size, size);
                 context.getMatrices().pop();
 
-                RenderSystem.disableBlend();
             }
         }
     }

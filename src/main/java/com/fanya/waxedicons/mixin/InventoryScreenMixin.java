@@ -2,6 +2,8 @@ package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.render.RenderLayer;
@@ -35,8 +37,8 @@ public abstract class InventoryScreenMixin {
         int guiLeft = accessor.getX();
         int guiTop = accessor.getY();
 
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, iconTexture);
+        GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+        RenderSystem.setShaderTexture(0, gpuTexture);
 
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
@@ -52,7 +54,5 @@ public abstract class InventoryScreenMixin {
                 context.getMatrices().pop();
             }
         }
-
-        RenderSystem.disableBlend();
     }
 }

@@ -2,6 +2,7 @@ package com.fanya.waxedicons.entries;
 
 import com.fanya.waxedicons.config.WaxedIconsConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -12,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -95,9 +97,11 @@ public class StylesPreviewEntry extends TooltipListEntry<String> {
             context.drawItem(this.previewItem, 0, 0);
             context.getMatrices().pop();
 
+
             Identifier iconTexture = Identifier.of("waxedicons", "textures/gui/waxed_icon_" + style + ".png");
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderTexture(0, iconTexture);
+
+            GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+            RenderSystem.setShaderTexture(0, gpuTexture);
 
             context.getMatrices().push();
             context.getMatrices().translate(0, 0, 300);
@@ -110,7 +114,6 @@ public class StylesPreviewEntry extends TooltipListEntry<String> {
                     iconTexture, iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
 
             context.getMatrices().pop();
-            RenderSystem.disableBlend();
 
             String styleName = style.substring(0, 1).toUpperCase() + style.substring(1);
 

@@ -2,6 +2,8 @@ package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.render.RenderLayer;
@@ -26,8 +28,8 @@ public class CreativeInventoryScreenMixin {
         Identifier iconTexture = WaxedBlocks.getCustomIcon();
         int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
 
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, iconTexture);
+        GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+        RenderSystem.setShaderTexture(0, gpuTexture);
 
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
@@ -43,7 +45,5 @@ public class CreativeInventoryScreenMixin {
                 context.getMatrices().pop();
             }
         }
-
-        RenderSystem.disableBlend();
     }
 }
