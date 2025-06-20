@@ -1,19 +1,16 @@
 package com.fanya.waxedicons.entries;
 
 import com.fanya.waxedicons.config.WaxedIconsConfig;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-
 
 import java.util.Collections;
 import java.util.List;
@@ -91,29 +88,24 @@ public class StylesPreviewEntry extends TooltipListEntry<String> {
             context.fill(previewX - 1, startY - 1, previewX + PREVIEW_SIZE + 1, startY + PREVIEW_SIZE + 1, 0xFF222222);
             context.fill(previewX, startY, previewX + PREVIEW_SIZE, startY + PREVIEW_SIZE, 0xFF000000);
 
-            context.getMatrices().push();
-            context.getMatrices().translate(previewX + (float) PREVIEW_SIZE / 2 - 16, startY + (float) PREVIEW_SIZE / 2 - 16, 0);
-            context.getMatrices().scale(2.0f, 2.0f, 1.0f);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate(previewX + (float) PREVIEW_SIZE / 2 - 16, startY + (float) PREVIEW_SIZE / 2 - 16);
+            context.getMatrices().scale(2.0f, 2.0f);
             context.drawItem(this.previewItem, 0, 0);
-            context.getMatrices().pop();
-
+            context.getMatrices().popMatrix();
 
             Identifier iconTexture = Identifier.of("waxedicons", "textures/gui/waxed_icon_" + style + ".png");
 
-            GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
-            RenderSystem.setShaderTexture(0, gpuTexture);
-
-            context.getMatrices().push();
-            context.getMatrices().translate(0, 0, 300);
+            context.getMatrices().pushMatrix();
 
             int iconX = previewX + PREVIEW_SIZE / 2 - 16;
             int iconY = startY + PREVIEW_SIZE / 2 - 16;
             int iconSize = 12;
 
-            context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                    iconTexture, iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, iconTexture,
+                    iconX, iconY, 0.0f, 0.0f, iconSize, iconSize, iconSize, iconSize);
 
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
 
             String styleName = style.substring(0, 1).toUpperCase() + style.substring(1);
 
