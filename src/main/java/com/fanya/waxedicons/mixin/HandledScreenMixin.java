@@ -2,12 +2,9 @@ package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
@@ -24,7 +21,6 @@ import java.util.Objects;
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin {
 
-
     @Unique
     private static final List<Class<?>> DISALLOWED_CONTAINERS = Arrays.asList(
             CreativeInventoryScreen.class,
@@ -32,38 +28,32 @@ public abstract class HandledScreenMixin {
             InventoryScreen.class
     );
 
-    @Inject(method = "drawSlots", at = @At("TAIL"))
-    public void onDrawSlots(DrawContext context, CallbackInfo ci) {
+    @Inject(method = "drawSlot", at = @At("TAIL"))
+    private void waxedicons$drawWaxedIcon(DrawContext context, Slot slot, CallbackInfo ci) {
         HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
+
+        if (!isAllowedScreen(screen)) return;
+
+        ItemStack stack = slot.getStack();
+        if (stack.isEmpty()) return;
+        if (!WaxedBlocks.WAXED_BLOCKS.contains(stack.getItem())) return;
+
         Identifier iconTexture = WaxedBlocks.getCustomIcon();
-        int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
-        if (!isAllowedScreen(screen)) {
-            return;
-        }
+        int size = 6;
+        Identifier alt = Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png");
+        if (Objects.equals(iconTexture, alt)) size = 8;
 
-        GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
-        RenderSystem.setShaderTexture(0, gpuTexture);
-
-        for (Slot slot : screen.getScreenHandler().slots) {
-            ItemStack stack = slot.getStack();
-            if (!stack.isEmpty() && WaxedBlocks.WAXED_BLOCKS.contains(stack.getItem())) {
-                int slotX = slot.x;
-                int slotY = slot.y;
-
-                context.getMatrices().push();
-                context.getMatrices().translate(0, 0, 300);
-                context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                        iconTexture, slotX, slotY, 0, 0, size, size, size, size);
-                context.getMatrices().pop();
-            }
-        }
-
+        RenderSystem.setShaderTexture(0, iconTexture);
+        context.getMatrices().push();
+        context.getMatrices().translate(0, 0, 300); // поверх предмета
+        context.drawTexture(iconTexture, slot.x, slot.y, 0, 0, size, size, size, size);
+        context.getMatrices().pop();
     }
 
     @Unique
     private boolean isAllowedScreen(HandledScreen<?> screen) {
-        for (Class<?> allowed : DISALLOWED_CONTAINERS) {
-            if (allowed.isInstance(screen)) {
+        for (Class<?> disallowed : DISALLOWED_CONTAINERS) {
+            if (disallowed.isInstance(screen)) {
                 return false;
             }
         }

@@ -28,8 +28,7 @@ public class DrawContextMixin {
 
             context.getMatrices().push();
             context.getMatrices().translate(0, 0, 300);
-            context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                    iconTexture, x, y, 0, 0, size, size, size, size);
+            context.drawTexture(iconTexture, x, y, 0, 0, size, size, size, size);
             context.getMatrices().pop();
         }
     }

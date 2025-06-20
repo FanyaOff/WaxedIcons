@@ -2,7 +2,6 @@ package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
@@ -28,8 +27,8 @@ public class CreativeInventoryScreenMixin {
         Identifier iconTexture = WaxedBlocks.getCustomIcon();
         int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
 
-        GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
-        RenderSystem.setShaderTexture(0, gpuTexture);
+        //GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+        RenderSystem.setShaderTexture(0, iconTexture);
 
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
@@ -40,8 +39,7 @@ public class CreativeInventoryScreenMixin {
 
                 context.getMatrices().push();
                 context.getMatrices().translate(0, 0, 300);
-                context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                        iconTexture, slotX, slotY, 0, 0, size, size, size, size);
+                context.drawTexture(/*id -> RenderLayer.getGuiTextured(iconTexture),*/iconTexture, slotX, slotY, 0, 0, size, size, size, size);
                 context.getMatrices().pop();
             }
         }

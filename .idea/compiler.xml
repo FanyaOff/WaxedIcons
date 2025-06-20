@@ -3,4 +3,11 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="21" />
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="WaxedIcons" options="-AoutRefMapFile=C:\Users\Fanya\Documents\projects\WaxedIcons\build\classes\java\main\WaxedIcons-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=C:\Users\Fanya\Documents\projects\WaxedIcons\build\loom-cache\mixin-map-net.fabricmc.yarn.1_21.1.21+build.9-v2.main.tiny -AinMapFileNamedIntermediary=C:\Users\Fanya\.gradle\caches\fabric-loom\1.21\net.fabricmc.yarn.1_21.1.21+build.9-v2\mappings.tiny" />
+      <module name="WaxedIcons.test" options="-AoutRefMapFile=C:\Users\Fanya\Documents\projects\WaxedIcons\build\classes\java\test\test-WaxedIcons-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=C:\Users\Fanya\Documents\projects\WaxedIcons\build\loom-cache\mixin-map-net.fabricmc.yarn.1_21.1.21+build.9-v2.test.tiny -AinMapFileNamedIntermediary=C:\Users\Fanya\.gradle\caches\fabric-loom\1.21\net.fabricmc.yarn.1_21.1.21+build.9-v2\mappings.tiny" />
+      <module name="com.fanya.WaxedIcons.main" options="-AoutRefMapFile=C:\Users\Fanya\Documents\projects\WaxedIcons\build\classes\java\main\WaxedIcons-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=C:\Users\Fanya\Documents\projects\WaxedIcons\build\loom-cache\mixin-map-net.fabricmc.yarn.1_21.1.21+build.9-v2.main.tiny -AinMapFileNamedIntermediary=C:\Users\Fanya\.gradle\caches\fabric-loom\1.21\net.fabricmc.yarn.1_21.1.21+build.9-v2\mappings.tiny" />
+    </option>
+  </component>
 </project>

@@ -2,7 +2,6 @@ package com.fanya.waxedicons.entries;
 
 import com.fanya.waxedicons.config.WaxedIconsConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -100,8 +99,8 @@ public class StylesPreviewEntry extends TooltipListEntry<String> {
 
             Identifier iconTexture = Identifier.of("waxedicons", "textures/gui/waxed_icon_" + style + ".png");
 
-            GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
-            RenderSystem.setShaderTexture(0, gpuTexture);
+            //GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
+            RenderSystem.setShaderTexture(0, iconTexture);
 
             context.getMatrices().push();
             context.getMatrices().translate(0, 0, 300);
@@ -110,8 +109,7 @@ public class StylesPreviewEntry extends TooltipListEntry<String> {
             int iconY = startY + PREVIEW_SIZE / 2 - 16;
             int iconSize = 12;
 
-            context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                    iconTexture, iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+            context.drawTexture(/*id -> RenderLayer.getGuiTextured(iconTexture),*/iconTexture, iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
 
             context.getMatrices().pop();
 
