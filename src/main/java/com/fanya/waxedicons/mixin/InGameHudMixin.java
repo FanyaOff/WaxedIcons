@@ -1,12 +1,10 @@
 package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -29,22 +27,18 @@ public class InGameHudMixin {
         Identifier iconTexture = WaxedBlocks.getCustomIcon();
         int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
 
-
         for (int i = 0; i < 9; i++) {
             ItemStack stack = client.player.getInventory().getStack(i);
             if (WaxedBlocks.WAXED_BLOCKS.contains(stack.getItem())) {
                 int x = client.getWindow().getScaledWidth() / 2 - 88 + i * 20;
                 int y = client.getWindow().getScaledHeight() - 19;
 
-                GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
-                RenderSystem.setShaderTexture(0, gpuTexture);
+                context.getMatrices().pushMatrix();
 
-                context.getMatrices().push();
-                context.getMatrices().translate(0, 0, 300);
-                context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                        iconTexture, x, y, 0, 0, size, size, size, size);
-                context.getMatrices().pop();
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, iconTexture,
+                        x, y, 0.0f, 0.0f, size, size, size, size);
 
+                context.getMatrices().popMatrix();
             }
         }
     }

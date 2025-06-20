@@ -1,12 +1,10 @@
 package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.display.CuttingRecipeDisplay;
 import net.minecraft.recipe.display.SlotDisplay;
@@ -40,6 +38,7 @@ public class StonecutterScreenMixin {
         Identifier iconTexture = WaxedBlocks.getCustomIcon();
         int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
 
+
         for (int i = this.scrollOffset; i < scrollOffset && i < grouping.size(); ++i) {
             int j = i - this.scrollOffset;
             int k = x + j % 4 * 16;
@@ -50,15 +49,12 @@ public class StonecutterScreenMixin {
             ItemStack resultStack = slotDisplay.getFirst(contextParameterMap);
 
             if (WaxedBlocks.WAXED_BLOCKS.contains(resultStack.getItem())) {
-                GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
-                RenderSystem.setShaderTexture(0, gpuTexture);
+                context.getMatrices().pushMatrix();
 
-                context.getMatrices().push();
-                context.getMatrices().translate(0, 0, 300);
-                context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                        iconTexture, k, m, 0, 0, size, size, size, size);
-                context.getMatrices().pop();
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, iconTexture,
+                        k, m, 0.0f, 0.0f, size, size, size, size);
 
+                context.getMatrices().popMatrix();
             }
         }
     }

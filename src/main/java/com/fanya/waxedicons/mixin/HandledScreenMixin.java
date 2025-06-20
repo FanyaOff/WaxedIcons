@@ -1,13 +1,10 @@
 package com.fanya.waxedicons.mixin;
 
 import com.fanya.waxedicons.util.WaxedBlocks;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
@@ -24,7 +21,6 @@ import java.util.Objects;
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin {
 
-
     @Unique
     private static final List<Class<?>> DISALLOWED_CONTAINERS = Arrays.asList(
             CreativeInventoryScreen.class,
@@ -37,12 +33,11 @@ public abstract class HandledScreenMixin {
         HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
         Identifier iconTexture = WaxedBlocks.getCustomIcon();
         int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
+
         if (!isAllowedScreen(screen)) {
             return;
         }
 
-        GpuTexture gpuTexture = MinecraftClient.getInstance().getTextureManager().getTexture(iconTexture).getGlTexture();
-        RenderSystem.setShaderTexture(0, gpuTexture);
 
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
@@ -50,14 +45,14 @@ public abstract class HandledScreenMixin {
                 int slotX = slot.x;
                 int slotY = slot.y;
 
-                context.getMatrices().push();
-                context.getMatrices().translate(0, 0, 300);
-                context.drawTexture(id -> RenderLayer.getGuiTextured(iconTexture),
-                        iconTexture, slotX, slotY, 0, 0, size, size, size, size);
-                context.getMatrices().pop();
+                context.getMatrices().pushMatrix();
+
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, iconTexture,
+                        slotX, slotY, 0.0f, 0.0f, size, size, size, size);
+
+                context.getMatrices().popMatrix();
             }
         }
-
     }
 
     @Unique
