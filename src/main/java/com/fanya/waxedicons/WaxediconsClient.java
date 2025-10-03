@@ -13,7 +13,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +35,8 @@ public class WaxediconsClient implements ClientModInitializer {
 
         WaxedBlocks.init();
 
-        configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.waxedicons.config",
-                GLFW.GLFW_KEY_F8,
-                "category.waxedicons"
-        ));
+
+        configKeyBinding = KeyBindingHelper.registerKeyBinding(WaxedIconsKeybinding.CONFIG_KEY);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (configKeyBinding.wasPressed()) {
@@ -87,3 +86,4 @@ public class WaxediconsClient implements ClientModInitializer {
         return builder.build();
     }
 }
+

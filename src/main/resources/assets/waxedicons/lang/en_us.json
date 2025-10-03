@@ -7,5 +7,6 @@
   "preview.waxedicons.title": "Available Styles Preview",
   "tooltip.waxedicons.icon_style": "Choose the style of the waxed block icon",
   "tooltip.waxedicons.preview": "These are all available icon styles",
-  "key.waxedicons.config": "Open WaxedIcons Settings"
+  "key.waxedicons.config": "Open WaxedIcons Settings",
+  "key.category.waxedicons.main": "WaxedIcons"
 }
