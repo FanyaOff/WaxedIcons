@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.screen.StonecutterScreenHandler;
 import net.minecraft.util.Identifier;
@@ -29,7 +28,7 @@ public abstract class StonecutterScreenMixin {
         StonecutterScreen screen = (StonecutterScreen) (Object) this;
         StonecutterScreenHandler handler = screen.getScreenHandler();
 
-        List<RecipeEntry<StonecuttingRecipe>> recipes = handler.getAvailableRecipes();
+        List<StonecuttingRecipe> recipes = handler.getAvailableRecipes();
 
         Identifier iconTexture = WaxedBlocks.getCustomIcon();
         int size = Objects.equals(iconTexture, Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png")) ? 8 : 6;
@@ -40,9 +39,8 @@ public abstract class StonecutterScreenMixin {
             int l = j / 4;
             int m = y + l * 18 + 2;
 
-            // Получаем результат рецепта напрямую
             assert MinecraftClient.getInstance().world != null;
-            ItemStack resultStack = recipes.get(i).value().getResult(MinecraftClient.getInstance().world.getRegistryManager());
+            ItemStack resultStack = recipes.get(i).getOutput(MinecraftClient.getInstance().world.getRegistryManager());
 
             if (WaxedBlocks.WAXED_BLOCKS.contains(resultStack.getItem())) {
                 context.getMatrices().push();

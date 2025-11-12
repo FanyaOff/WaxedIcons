@@ -20,7 +20,7 @@ import java.util.Objects;
 public class InGameHudMixin {
 
     @Inject(method = "renderHotbar", at = @At("TAIL"))
-    public void onRenderHUD(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+    public void onRenderHUD(float tickDelta, DrawContext context, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
 
         if (client.player == null) return;
