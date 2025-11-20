@@ -4,13 +4,7 @@
   "package": "com.fanya.waxedicons.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "CreativeInventoryScreenMixin",
-    "DrawContextMixin",
-    "HandledScreenAccessor",
-    "HandledScreenMixin",
-    "InGameHudMixin",
-    "InventoryScreenMixin",
-    "StonecutterScreenMixin"
+    "DrawContextMixin"
   ],
   "injectors": {
     "defaultRequire": 1
