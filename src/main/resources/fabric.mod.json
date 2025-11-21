@@ -23,7 +23,6 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
-    "minecraft": ">=${minecraft_version}",
-    "cloth-config": "*"
+    "minecraft": ">=${minecraft_version}"
   }
 }
