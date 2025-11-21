@@ -52,11 +52,9 @@ public abstract class DrawContextMixin {
         
         this.matrices.push();
         this.matrices.translate(0.0F, 0.0F, 300);
-        
-        // Convert alpha to color int (ARGB format)
-        int color = (int) (alpha * 255) << 24 | 0xFFFFFF; // Alpha in high byte, white RGB
-        
-        // Use the updated drawTexturedQuad method signature for 1.21.2
+
+        int color = (int) (alpha * 255) << 24 | 0xFFFFFF;
+
         drawTexturedQuad(
             RenderLayer::getGuiTextured, iconTexture, x, x + size, y, y + size,
             0.0f, 1.0f, 0.0f, 1.0f, color

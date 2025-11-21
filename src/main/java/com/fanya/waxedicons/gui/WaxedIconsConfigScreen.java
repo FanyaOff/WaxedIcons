@@ -231,8 +231,6 @@ public class WaxedIconsConfigScreen extends Screen {
                 int iconSize = Math.max(8, slotSize / 3);
                 int iconX = slotX + slotSize - iconSize;
 
-                // Use the correct drawTexture method signature for 1.21.2
-                // The method now requires a Function<Identifier, RenderLayer> as first parameter
                 context.drawTexture(RenderLayer::getGuiTextured, this.iconTexture, iconX, slotY, 0.0f, 0.0f,
                     iconSize, iconSize, iconSize, iconSize);
                 
