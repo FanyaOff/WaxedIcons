@@ -3,6 +3,7 @@ package com.fanya.waxedicons.gui;
 import com.fanya.waxedicons.config.WaxedIconsConfig;
 import com.fanya.waxedicons.config.WaxedIconsConfigManager;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -204,10 +205,21 @@ public class WaxedIconsConfigScreen extends Screen {
             if (this.isHovered() && !this.selected) {
                 borderColor = 0xFF777777;
             }
-            context.drawBorder(this.getX(), this.getY(), this.width, this.height, borderColor);
+
+            context.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + 1, borderColor);
+            context.fill(this.getX(), this.getY() + this.height - 1, this.getX() + this.width, this.getY() + this.height, borderColor);
+            context.fill(this.getX(), this.getY(), this.getX() + 1, this.getY() + this.height, borderColor);
+            context.fill(this.getX() + this.width - 1, this.getY(), this.getX() + this.width, this.getY() + this.height, borderColor);
 
             if (this.selected) {
-                context.drawBorder(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, ACCENT_COLOR);
+                int x1 = this.getX() - 1;
+                int y1 = this.getY() - 1;
+                int w = this.width + 2;
+                int h = this.height + 2;
+                context.fill(x1, y1, x1 + w, y1 + 1, ACCENT_COLOR);
+                context.fill(x1, y1 + h - 1, x1 + w, y1 + h, ACCENT_COLOR);
+                context.fill(x1, y1, x1 + 1, y1 + h, ACCENT_COLOR);
+                context.fill(x1 + w - 1, y1, x1 + w, y1 + h, ACCENT_COLOR);
             }
 
             int slotSize = Math.min(32, this.width - 16);
@@ -259,22 +271,13 @@ public class WaxedIconsConfigScreen extends Screen {
         }
 
         @Override
-        public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-            boolean result = super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-
-            this.updateMessage();
-            this.applyValue();
-            return result;
+        protected void onDrag(Click click, double offsetX, double offsetY) {
+            super.onDrag(click, offsetX, offsetY);
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            boolean result = super.mouseClicked(mouseX, mouseY, button);
-            if (result) {
-                this.updateMessage();
-                this.applyValue();
-            }
-            return result;
+        public void onClick(Click click, boolean doubled) {
+            super.onClick(click, doubled);
         }
 
         @Override
@@ -282,7 +285,11 @@ public class WaxedIconsConfigScreen extends Screen {
             int trackHeight = 4;
             int trackY = this.getY() + (this.height - trackHeight) / 2;
             context.fill(this.getX(), trackY, this.getX() + this.width, trackY + trackHeight, PANEL_COLOR);
-            context.drawBorder(this.getX(), trackY, this.width, trackHeight, BORDER_COLOR);
+            // Draw track border
+            context.fill(this.getX(), trackY, this.getX() + this.width, trackY + 1, BORDER_COLOR);
+            context.fill(this.getX(), trackY + trackHeight - 1, this.getX() + this.width, trackY + trackHeight, BORDER_COLOR);
+            context.fill(this.getX(), trackY, this.getX() + 1, trackY + trackHeight, BORDER_COLOR);
+            context.fill(this.getX() + this.width - 1, trackY, this.getX() + this.width, trackY + trackHeight, BORDER_COLOR);
 
             int fillWidth = (int) (this.value * this.width);
             if (fillWidth > 0) {
@@ -295,7 +302,11 @@ public class WaxedIconsConfigScreen extends Screen {
 
             int handleColor = this.isHovered() ? 0xFFFFFFFF : ACCENT_COLOR;
             context.fill(handleX, this.getY(), handleX + handleWidth, this.getY() + handleHeight, handleColor);
-            context.drawBorder(handleX, this.getY(), handleWidth, handleHeight, BORDER_COLOR);
+
+            context.fill(handleX, this.getY(), handleX + handleWidth, this.getY() + 1, BORDER_COLOR);
+            context.fill(handleX, this.getY() + handleHeight - 1, handleX + handleWidth, this.getY() + handleHeight, BORDER_COLOR);
+            context.fill(handleX, this.getY(), handleX + 1, this.getY() + handleHeight, BORDER_COLOR);
+            context.fill(handleX + handleWidth - 1, this.getY(), handleX + handleWidth, this.getY() + handleHeight, BORDER_COLOR);
 
             context.drawCenteredTextWithShadow(WaxedIconsConfigScreen.this.textRenderer,
                     this.getMessage(), this.getX() + this.width / 2, this.getY() - 12, TEXT_COLOR);
