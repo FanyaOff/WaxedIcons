@@ -33,7 +33,7 @@ public class WaxedBlocks {
             }
         });
 
-        LOGGER.info("WaxedBlocks: найдено {} waxed-предметов.", WAXED_BLOCKS.size());
+        LOGGER.info("[WaxedUtils] Finded waxed blocks: {}", WAXED_BLOCKS.size());
     }
 
     public static boolean isWaxed(Item item) {
