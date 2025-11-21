@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -226,14 +227,15 @@ public class WaxedIconsConfigScreen extends Screen {
             if (this.iconTexture != null) {
                 context.getMatrices().push();
                 context.getMatrices().translate(0, 0, 200);
-                context.setShaderColor(1.0f, 1.0f, 1.0f, this.opacity);
                 
                 int iconSize = Math.max(8, slotSize / 3);
                 int iconX = slotX + slotSize - iconSize;
 
-                context.drawTexture(this.iconTexture, iconX, slotY, iconSize, iconSize,
-                    0, 0, iconSize, iconSize, iconSize, iconSize);
-                context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+                // Use the correct drawTexture method signature for 1.21.2
+                // The method now requires a Function<Identifier, RenderLayer> as first parameter
+                context.drawTexture(RenderLayer::getGuiTextured, this.iconTexture, iconX, slotY, 0.0f, 0.0f,
+                    iconSize, iconSize, iconSize, iconSize);
+                
                 context.getMatrices().pop();
             }
         }
