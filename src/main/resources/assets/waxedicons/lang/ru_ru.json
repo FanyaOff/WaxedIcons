@@ -11,5 +11,6 @@
   "preview.waxedicons.title": "Предварительный просмотр доступных стилей",
   "tooltip.waxedicons.icon_style": "Выберите стиль значка вощеного блока",
   "tooltip.waxedicons.preview": "Это все доступные стили значков",
-  "key.waxedicons.config": "Открыть настройки WaxedIcons"
+  "key.waxedicons.config": "Открыть настройки WaxedIcons",
+  "key.category.waxedicons.main": "WaxedIcons"
 }
