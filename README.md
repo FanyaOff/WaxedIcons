@@ -13,6 +13,8 @@ No additional mods are required (idk why the author used trimmed for such a simp
 
 - Removed cloth-config dependency
 
+- added compatibility with other mods, that adds waxed stuff (it works by check if item id contains "waxed")
+
 <img width="1920" height="1009" alt="image" src="https://github.com/user-attachments/assets/0ff7fd5f-9941-42fc-a00e-d3b316429a97" />
 
 
