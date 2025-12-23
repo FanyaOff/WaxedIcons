@@ -3,17 +3,16 @@ package com.fanya.waxedicons.gui;
 import com.fanya.waxedicons.config.WaxedIconsConfig;
 import com.fanya.waxedicons.config.WaxedIconsConfigManager;
 import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.joml.Matrix3x2f;
 
 public class WaxedIconsConfigScreen extends Screen {
     private final Screen parent;
@@ -60,17 +59,20 @@ public class WaxedIconsConfigScreen extends Screen {
 
         this.defaultPreview = new StylePreviewWidget(
                 startX + previewSpacing, previewY, previewSize, previewSize,
-                DEFAULT_ICON, "default", config.iconStyle.equals("default")
+                DEFAULT_ICON, "default", config.iconStyle.equals("default"),
+                () -> this.selectStyle("default")
         );
 
         this.alternativePreview = new StylePreviewWidget(
                 startX + previewSpacing * 2 + previewSize, previewY, previewSize, previewSize,
-                ALTERNATIVE_ICON, "alternative", config.iconStyle.equals("alternative")
+                ALTERNATIVE_ICON, "alternative", config.iconStyle.equals("alternative"),
+                () -> this.selectStyle("alternative")
         );
 
         this.honeycombPreview = new StylePreviewWidget(
                 startX + previewSpacing * 3 + previewSize * 2, previewY, previewSize, previewSize,
-                HONEYCOMB_ICON, "honeycomb", config.iconStyle.equals("honeycomb")
+                HONEYCOMB_ICON, "honeycomb", config.iconStyle.equals("honeycomb"),
+                () -> this.selectStyle("honeycomb")
         );
 
         this.addDrawableChild(defaultPreview);
@@ -172,16 +174,20 @@ public class WaxedIconsConfigScreen extends Screen {
         this.client.setScreen(this.parent);
     }
 
-    public class StylePreviewWidget extends ButtonWidget {
+    public class StylePreviewWidget extends ClickableWidget implements Drawable, Element, Selectable {
         private final Identifier iconTexture;
         private boolean selected;
         private float opacity;
+        private final String style;
+        private final Runnable onClick;
 
-        public StylePreviewWidget(int x, int y, int width, int height, Identifier iconTexture, String style, boolean selected) {
-            super(x, y, width, height, Text.empty(), (button) -> WaxedIconsConfigScreen.this.selectStyle(style), DEFAULT_NARRATION_SUPPLIER);
+        public StylePreviewWidget(int x, int y, int width, int height, Identifier iconTexture, String style, boolean selected, Runnable onClick) {
+            super(x, y, width, height, Text.empty());
             this.iconTexture = iconTexture;
+            this.style = style;
             this.selected = selected;
-            this.opacity = config.iconOpacity / 100.0f;
+            this.onClick = onClick;
+            this.opacity = WaxedIconsConfigScreen.this.config.iconOpacity / 100.0f;
         }
 
         public void setSelected(boolean selected) {
@@ -193,12 +199,11 @@ public class WaxedIconsConfigScreen extends Screen {
         }
 
         @Override
-        public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
             int backgroundColor = this.selected ? SELECTED_COLOR : PANEL_COLOR;
             if (this.isHovered()) {
                 backgroundColor = this.selected ? SELECTED_COLOR : HOVER_COLOR;
             }
-
             context.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, backgroundColor);
 
             int borderColor = this.selected ? ACCENT_COLOR : BORDER_COLOR;
@@ -233,23 +238,36 @@ public class WaxedIconsConfigScreen extends Screen {
                 context.getMatrices().pushMatrix();
                 float scale = slotSize / 16.0f;
                 context.getMatrices().scale(scale, scale);
-                context.drawItem(previewItem,
+                context.drawItem(WaxedIconsConfigScreen.this.previewItem,
                         (int)(slotX / scale), (int)(slotY / scale));
                 context.getMatrices().popMatrix();
             }
 
             if (this.iconTexture != null) {
-                context.getMatrices().pushMatrix();
-                context.getMatrices().translate(0, 0);
-
                 int iconSize = Math.max(8, slotSize / 3);
                 int iconX = slotX + slotSize - iconSize;
-
                 context.drawTexture(RenderPipelines.GUI_TEXTURED, this.iconTexture, iconX, slotY, 0.0f, 0.0f,
                         iconSize, iconSize, iconSize, iconSize);
-
-                context.getMatrices().popMatrix();
             }
+        }
+
+        @Override
+        public boolean mouseClicked(Click click, boolean doubled) {
+            if (this.isMouseOver(click.x(), click.y())) {
+                this.onClick.run();
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public SelectionType getType() {
+            return this.isFocused() ? SelectionType.FOCUSED : SelectionType.NONE;
+        }
+
+        @Override
+        protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+
         }
     }
 
