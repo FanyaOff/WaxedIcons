@@ -1,9 +1,9 @@
 package com.fanya.waxedicons.util;
 
 import com.fanya.waxedicons.config.WaxedIconsConfigManager;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +23,8 @@ public class WaxedBlocks {
     public static void init() {
         WAXED_BLOCKS.clear();
 
-        Registries.ITEM.forEach(item -> {
-            Identifier id = Registries.ITEM.getId(item);
+        BuiltInRegistries.ITEM.forEach(item -> {
+            Identifier id = BuiltInRegistries.ITEM.getKey(item);
             if (id != null) {
                 String path = id.getPath().toLowerCase();
                 if (path.contains("waxed")) {
@@ -33,7 +33,7 @@ public class WaxedBlocks {
             }
         });
 
-        LOGGER.info("[WaxedUtils] Finded waxed blocks: {}", WAXED_BLOCKS.size());
+        LOGGER.info("[WaxedIcons] Found waxed blocks: {}", WAXED_BLOCKS.size());
     }
 
     public static boolean isWaxed(Item item) {

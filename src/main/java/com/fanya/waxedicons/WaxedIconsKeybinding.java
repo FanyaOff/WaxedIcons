@@ -1,15 +1,18 @@
 package com.fanya.waxedicons;
 
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 
 public class WaxedIconsKeybinding {
-    public static final KeyBinding.Category WAXED_CATEGORY = KeyBinding.Category.create(Identifier.of("waxedicons", "main"));
-    public static final KeyBinding CONFIG_KEY = new KeyBinding(
+    public static final KeyMapping.Category CONFIG_CATEGORY = KeyMapping.Category.register(
+            Identifier.fromNamespaceAndPath("waxedicons", "main")
+    );
+
+    public static final KeyMapping CONFIG_KEY = new KeyMapping(
             "key.waxedicons.config",
-            InputUtil.Type.KEYSYM,
-            InputUtil.GLFW_KEY_G,
-            WAXED_CATEGORY
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_G,
+            CONFIG_CATEGORY
     );
 }

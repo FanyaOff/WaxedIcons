@@ -1,7 +1,7 @@
 package com.fanya.waxedicons.config;
 
 import com.fanya.waxedicons.WaxediconsClient;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.*;
@@ -13,6 +13,7 @@ public class WaxedIconsConfig {
 
     public String iconStyle = "default";
     public int iconOpacity = 80;
+    public String iconCorner = "top_right";
 
     public static final String[] AVAILABLE_STYLES = {
             "default",
@@ -20,11 +21,18 @@ public class WaxedIconsConfig {
             "honeycomb"
     };
 
+    public static final String[] AVAILABLE_CORNERS = {
+            "top_left",
+            "top_right",
+            "bottom_left",
+            "bottom_right"
+    };
+
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_FILE = Paths.get("config", WaxediconsClient.MOD_ID + ".json");
 
     public Identifier getIconTexture() {
-        return Identifier.of("waxedicons", "textures/gui/waxed_icon_" + iconStyle + ".png");
+        return Identifier.fromNamespaceAndPath("waxedicons", "textures/gui/waxed_icon_" + iconStyle + ".png");
     }
 
     public Identifier getValidIconTexture() {
@@ -48,6 +56,7 @@ public class WaxedIconsConfig {
             try (FileReader reader = new FileReader(CONFIG_FILE.toFile())) {
                 WaxedIconsConfig config = GSON.fromJson(reader, WaxedIconsConfig.class);
                 if (config != null) {
+                    config.validate();
                     WaxediconsClient.LOGGER.info("Config loaded from: {}", CONFIG_FILE);
                     return config;
                 }
@@ -55,9 +64,31 @@ public class WaxedIconsConfig {
                 WaxediconsClient.LOGGER.error("Failed to load config, using defaults", e);
             }
         }
-        
+
         WaxedIconsConfig defaultConfig = new WaxedIconsConfig();
         defaultConfig.save();
         return defaultConfig;
+    }
+
+    public void validate() {
+        if (!contains(AVAILABLE_STYLES, this.iconStyle)) {
+            this.iconStyle = "default";
+        }
+
+        if (!contains(AVAILABLE_CORNERS, this.iconCorner)) {
+            this.iconCorner = "top_right";
+        }
+
+        this.iconOpacity = Math.max(0, Math.min(100, this.iconOpacity));
+    }
+
+    private static boolean contains(String[] values, String value) {
+        for (String candidate : values) {
+            if (candidate.equals(value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -1,7 +1,7 @@
 package com.fanya.waxedicons.config;
 
 import com.fanya.waxedicons.WaxediconsClient;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class WaxedIconsConfigManager {
     private static WaxedIconsConfig CONFIG;
@@ -27,5 +27,9 @@ public class WaxedIconsConfigManager {
 
     public static float getIconOpacity() {
         return CONFIG.iconOpacity / 100.0f;
+    }
+
+    public static String getIconCorner() {
+        return CONFIG.iconCorner;
     }
 }

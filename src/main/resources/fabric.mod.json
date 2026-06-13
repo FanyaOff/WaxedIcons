@@ -17,12 +17,8 @@
       "com.fanya.waxedicons.config.ModMenuIntegration"
     ]
   },
-  "mixins": [
-    "waxedicons.mixins.json"
-  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "fabric": "*",
     "minecraft": ">=${minecraft_version}"
   }
 }
