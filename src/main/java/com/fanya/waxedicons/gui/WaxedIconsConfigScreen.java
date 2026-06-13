@@ -2,40 +2,36 @@ package com.fanya.waxedicons.gui;
 
 import com.fanya.waxedicons.config.WaxedIconsConfig;
 import com.fanya.waxedicons.config.WaxedIconsConfigManager;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.Arrays;
 
 public class WaxedIconsConfigScreen extends Screen {
+    private static final Identifier PREVIEW_BLOCK_ID = Identifier.withDefaultNamespace("copper_block");
+    private static final Identifier DEFAULT_ICON = Identifier.fromNamespaceAndPath("waxedicons", "textures/gui/waxed_icon_default.png");
+    private static final Identifier ALTERNATIVE_ICON = Identifier.fromNamespaceAndPath("waxedicons", "textures/gui/waxed_icon_alternative.png");
+    private static final Identifier HONEYCOMB_ICON = Identifier.fromNamespaceAndPath("waxedicons", "textures/gui/waxed_icon_honeycomb.png");
+
     private final Screen parent;
     private final WaxedIconsConfig config;
-    private StylePreviewWidget defaultPreview;
-    private StylePreviewWidget alternativePreview;
-    private StylePreviewWidget honeycombPreview;
-    private final ItemStack previewItem = new ItemStack(Items.COPPER_BLOCK);
-
-    private static final Identifier DEFAULT_ICON = Identifier.of("waxedicons", "textures/gui/waxed_icon_default.png");
-    private static final Identifier ALTERNATIVE_ICON = Identifier.of("waxedicons", "textures/gui/waxed_icon_alternative.png");
-    private static final Identifier HONEYCOMB_ICON = Identifier.of("waxedicons", "textures/gui/waxed_icon_honeycomb.png");
-
-    private static final int PANEL_COLOR = 0xFF2A2A2A;
-    private static final int SELECTED_COLOR = 0xFF4A4A4A;
-    private static final int HOVER_COLOR = 0xFF3A3A3A;
-    private static final int ACCENT_COLOR = 0xFFFFD700;
-    private static final int TEXT_COLOR = 0xFFFFFFFF;
-    private static final int SUBTITLE_COLOR = 0xFFCCCCCC;
-    private static final int BORDER_COLOR = 0xFF555555;
+    private ItemStack previewItem = ItemStack.EMPTY;
 
     public WaxedIconsConfigScreen(Screen parent) {
-        super(Text.translatable("title.waxedicons.config"));
+        super(Component.translatable("title.waxedicons.config"));
         this.parent = parent;
         this.config = WaxedIconsConfigManager.getConfig();
     }
@@ -43,291 +39,190 @@ public class WaxedIconsConfigScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+        this.config.validate();
 
         int centerX = this.width / 2;
-        int contentWidth = Math.min(400, this.width - 40);
-        int startX = centerX - contentWidth / 2;
-        int currentY = 40;
+        int centerY = this.height / 2;
 
-        currentY += 40;
+        int leftX = centerX - 160;
+        int startY = centerY - 46;
 
-        currentY += 20;
+        Button styleButton = Button.builder(getStyleText(), button -> {
+            cycleStyle();
+            button.setMessage(getStyleText());
+        }).bounds(leftX, startY, 150, 20).build();
 
-        int previewSize = Math.min(64, contentWidth / 5);
-        int previewSpacing = (contentWidth - previewSize * 3) / 4;
-        int previewY = currentY;
+        Button cornerButton = Button.builder(getCornerText(), button -> {
+            cycleCorner();
+            button.setMessage(getCornerText());
+        }).bounds(leftX, startY + 28, 150, 20).build();
 
-        this.defaultPreview = new StylePreviewWidget(
-                startX + previewSpacing, previewY, previewSize, previewSize,
-                DEFAULT_ICON, "default", config.iconStyle.equals("default"),
-                () -> this.selectStyle("default")
-        );
+        OpacitySlider opacitySlider = new OpacitySlider(leftX, startY + 56, 150, 20, this.config.iconOpacity / 100.0);
 
-        this.alternativePreview = new StylePreviewWidget(
-                startX + previewSpacing * 2 + previewSize, previewY, previewSize, previewSize,
-                ALTERNATIVE_ICON, "alternative", config.iconStyle.equals("alternative"),
-                () -> this.selectStyle("alternative")
-        );
+        this.addRenderableWidget(styleButton);
+        this.addRenderableWidget(cornerButton);
+        this.addRenderableWidget(opacitySlider);
 
-        this.honeycombPreview = new StylePreviewWidget(
-                startX + previewSpacing * 3 + previewSize * 2, previewY, previewSize, previewSize,
-                HONEYCOMB_ICON, "honeycomb", config.iconStyle.equals("honeycomb"),
-                () -> this.selectStyle("honeycomb")
-        );
+        int rightX = centerX + 10;
+        LivePreviewWidget livePreview = new LivePreviewWidget(rightX, startY, 150, 76);
+        this.addRenderableWidget(livePreview);
 
-        this.addDrawableChild(defaultPreview);
-        this.addDrawableChild(alternativePreview);
-        this.addDrawableChild(honeycombPreview);
-
-        currentY += previewSize + 40;
-
-        int sliderWidth = Math.min(300, contentWidth);
-        ModernSliderWidget opacitySlider = new ModernSliderWidget(
-                centerX - sliderWidth / 2, currentY, sliderWidth, 20,
-                Text.translatable("option.waxedicons.opacity", config.iconOpacity + "%"),
-                config.iconOpacity / 100.0
-        );
-        this.addDrawableChild(opacitySlider);
-
-        int buttonY = this.height - 35;
-        int buttonWidth = 80;
-
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.done"), (button) -> this.saveAndClose()).dimensions(centerX - buttonWidth - 5, buttonY, buttonWidth, 20).build());
-
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("gui.cancel"), (button) -> {
-            assert this.client != null;
-            this.client.setScreen(this.parent);
-        }).dimensions(centerX + 5, buttonY, buttonWidth, 20).build());
+        int buttonY = this.height - 30;
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> this.saveAndClose())
+                .bounds(centerX - 155, buttonY, 150, 20)
+                .build());
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), button -> this.minecraft.setScreen(this.parent))
+                .bounds(centerX + 5, buttonY, 150, 20)
+                .build());
     }
 
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderPanoramaBackground(context, delta);
-        context.fillGradient(0, 0, this.width, this.height, 0x66101010, 0x66202020);
-
-        int centerX = this.width / 2;
-
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, centerX, 20, ACCENT_COLOR);
-
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.translatable("option.waxedicons.icon_style"), centerX, 80, SUBTITLE_COLOR);
-
-        this.drawStyleLabels(context);
-
-        super.render(context, mouseX, mouseY, delta);
-
-        this.drawTooltips(context, mouseX, mouseY);
+    private Component getStyleText() {
+        return Component.translatable("option.waxedicons.icon_style").append(": ").append(Component.translatable("style.waxedicons." + this.config.iconStyle));
     }
 
-    @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+    private Component getCornerText() {
+        return Component.translatable("option.waxedicons.icon_corner").append(": ").append(Component.translatable("corner.waxedicons." + this.config.iconCorner));
     }
 
-    private void drawStyleLabels(DrawContext context) {
-        int labelY = this.defaultPreview.getY() + this.defaultPreview.getHeight() + 8;
-
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.translatable("style.waxedicons.default"),
-                this.defaultPreview.getX() + this.defaultPreview.getWidth() / 2, labelY, TEXT_COLOR);
-
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.translatable("style.waxedicons.alternative"),
-                this.alternativePreview.getX() + this.alternativePreview.getWidth() / 2, labelY, TEXT_COLOR);
-
-        context.drawCenteredTextWithShadow(this.textRenderer,
-                Text.translatable("style.waxedicons.honeycomb"),
-                this.honeycombPreview.getX() + this.honeycombPreview.getWidth() / 2, labelY, TEXT_COLOR);
+    private void cycleStyle() {
+        int index = Arrays.asList(WaxedIconsConfig.AVAILABLE_STYLES).indexOf(this.config.iconStyle);
+        this.config.iconStyle = WaxedIconsConfig.AVAILABLE_STYLES[(index + 1) % WaxedIconsConfig.AVAILABLE_STYLES.length];
     }
 
-    private void drawTooltips(DrawContext context, int mouseX, int mouseY) {
-        if (this.defaultPreview.isMouseOver(mouseX, mouseY)) {
-            context.drawTooltip(this.textRenderer, Text.translatable("style.waxedicons.default"), mouseX, mouseY);
-        } else if (this.alternativePreview.isMouseOver(mouseX, mouseY)) {
-            context.drawTooltip(this.textRenderer, Text.translatable("style.waxedicons.alternative"), mouseX, mouseY);
-        } else if (this.honeycombPreview.isMouseOver(mouseX, mouseY)) {
-            context.drawTooltip(this.textRenderer, Text.translatable("style.waxedicons.honeycomb"), mouseX, mouseY);
-        }
-    }
-
-    private void selectStyle(String style) {
-        this.config.iconStyle = style;
-        this.defaultPreview.setSelected(style.equals("default"));
-        this.alternativePreview.setSelected(style.equals("alternative"));
-        this.honeycombPreview.setSelected(style.equals("honeycomb"));
-    }
-
-    private void updatePreviewOpacity() {
-        this.defaultPreview.updateOpacity(config.iconOpacity / 100.0f);
-        this.alternativePreview.updateOpacity(config.iconOpacity / 100.0f);
-        this.honeycombPreview.updateOpacity(config.iconOpacity / 100.0f);
+    private void cycleCorner() {
+        int index = Arrays.asList(WaxedIconsConfig.AVAILABLE_CORNERS).indexOf(this.config.iconCorner);
+        this.config.iconCorner = WaxedIconsConfig.AVAILABLE_CORNERS[(index + 1) % WaxedIconsConfig.AVAILABLE_CORNERS.length];
     }
 
     private void saveAndClose() {
+        this.config.validate();
         WaxedIconsConfigManager.saveConfig();
-        assert this.client != null;
-        this.client.setScreen(this.parent);
+        this.minecraft.setScreen(this.parent);
     }
 
     @Override
-    public void close() {
-        assert this.client != null;
-        this.client.setScreen(this.parent);
+    public void onClose() {
+        this.config.validate();
+        this.minecraft.setScreen(this.parent);
     }
 
-    public class StylePreviewWidget extends ClickableWidget implements Drawable, Element, Selectable {
-        private final Identifier iconTexture;
-        private boolean selected;
-        private float opacity;
-        private final String style;
-        private final Runnable onClick;
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        graphics.fillGradient(0, 0, this.width, this.height, 0xC0101010, 0xD0101010);
+        graphics.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+    }
 
-        public StylePreviewWidget(int x, int y, int width, int height, Identifier iconTexture, String style, boolean selected, Runnable onClick) {
-            super(x, y, width, height, Text.empty());
-            this.iconTexture = iconTexture;
-            this.style = style;
-            this.selected = selected;
-            this.onClick = onClick;
-            this.opacity = WaxedIconsConfigScreen.this.config.iconOpacity / 100.0f;
+    private ItemStack createPreviewItem() {
+        if (!this.previewItem.isEmpty()) {
+            return this.previewItem;
         }
 
-        public void setSelected(boolean selected) {
-            this.selected = selected;
+        this.previewItem = BuiltInRegistries.ITEM.get(PREVIEW_BLOCK_ID)
+                .map(holder -> {
+                    bindPreviewBlockComponents(holder);
+                    return new ItemStack(holder);
+                })
+                .orElse(ItemStack.EMPTY);
+        return this.previewItem;
+    }
+
+    private static void bindPreviewBlockComponents(Holder.Reference<Item> holder) {
+        if (holder.areComponentsBound()) {
+            return;
         }
 
-        public void updateOpacity(float opacity) {
-            this.opacity = opacity;
+        holder.bindComponents(DataComponentMap.builder()
+                .addAll(DataComponents.COMMON_ITEM_COMPONENTS)
+                .set(DataComponents.ITEM_NAME, Component.translatable("block.minecraft.copper_block"))
+                .set(DataComponents.ITEM_MODEL, PREVIEW_BLOCK_ID)
+                .build());
+    }
+
+    private Identifier selectedIconTexture() {
+        return switch (this.config.iconStyle) {
+            case "alternative" -> ALTERNATIVE_ICON;
+            case "honeycomb" -> HONEYCOMB_ICON;
+            default -> DEFAULT_ICON;
+        };
+    }
+
+    private static int baseIconSize(Identifier texture) {
+        String path = texture.getPath();
+        if (path.contains("alternative")) return 8;
+        if (path.contains("honeycomb")) return 7;
+        return 6;
+    }
+
+    private static int[] cornerPosition(int x, int y, int slotSize, int iconSize, String corner) {
+        return switch (corner) {
+            case "top_left" -> new int[]{x, y};
+            case "bottom_left" -> new int[]{x, y + slotSize - iconSize};
+            case "bottom_right" -> new int[]{x + slotSize - iconSize, y + slotSize - iconSize};
+            default -> new int[]{x + slotSize - iconSize, y};
+        };
+    }
+
+    private void drawPreviewItem(GuiGraphicsExtractor graphics, int x, int y, int size) {
+        ItemStack item = this.createPreviewItem();
+        if (item.isEmpty()) return;
+
+        graphics.pose().pushMatrix();
+        float scale = size / 16.0F;
+        graphics.pose().scale(scale, scale);
+        graphics.item(item, (int) (x / scale), (int) (y / scale));
+        graphics.pose().popMatrix();
+    }
+
+    private void drawIcon(GuiGraphicsExtractor graphics, Identifier iconTexture, int slotX, int slotY, int slotSize) {
+        float scale = slotSize / 16.0F;
+        int iconSize = Math.max(4, Math.round(baseIconSize(iconTexture) * scale));
+        int[] iconPos = cornerPosition(slotX, slotY, slotSize, iconSize, this.config.iconCorner);
+        int color = (int) (this.config.iconOpacity / 100.0F * 255.0F) << 24 | 0xFFFFFF;
+
+        graphics.blit(RenderPipelines.GUI_TEXTURED, iconTexture, iconPos[0], iconPos[1],
+                0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize, color);
+    }
+
+    private class LivePreviewWidget extends AbstractWidget {
+        public LivePreviewWidget(int x, int y, int width, int height) {
+            super(x, y, width, height, Component.empty());
         }
 
         @Override
-        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-            int backgroundColor = this.selected ? SELECTED_COLOR : PANEL_COLOR;
-            if (this.isHovered()) {
-                backgroundColor = this.selected ? SELECTED_COLOR : HOVER_COLOR;
-            }
-            context.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, backgroundColor);
-
-            int borderColor = this.selected ? ACCENT_COLOR : BORDER_COLOR;
-            if (this.isHovered() && !this.selected) {
-                borderColor = 0xFF777777;
-            }
-
-            context.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + 1, borderColor);
-            context.fill(this.getX(), this.getY() + this.height - 1, this.getX() + this.width, this.getY() + this.height, borderColor);
-            context.fill(this.getX(), this.getY(), this.getX() + 1, this.getY() + this.height, borderColor);
-            context.fill(this.getX() + this.width - 1, this.getY(), this.getX() + this.width, this.getY() + this.height, borderColor);
-
-            if (this.selected) {
-                int x1 = this.getX() - 1;
-                int y1 = this.getY() - 1;
-                int w = this.width + 2;
-                int h = this.height + 2;
-                context.fill(x1, y1, x1 + w, y1 + 1, ACCENT_COLOR);
-                context.fill(x1, y1 + h - 1, x1 + w, y1 + h, ACCENT_COLOR);
-                context.fill(x1, y1, x1 + 1, y1 + h, ACCENT_COLOR);
-                context.fill(x1 + w - 1, y1, x1 + w, y1 + h, ACCENT_COLOR);
-            }
-
-            int slotSize = Math.min(32, this.width - 16);
+        protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+            int slotSize = 48;
             int slotX = this.getX() + (this.width - slotSize) / 2;
-            int slotY = this.getY() + (this.height - slotSize) / 2;
+            int slotY = this.getY() + (this.height - slotSize) / 2 + 4;
 
-            context.fill(slotX - 1, slotY - 1, slotX + slotSize + 1, slotY + slotSize + 1, 0xFF333333);
-            context.fill(slotX, slotY, slotX + slotSize, slotY + slotSize, 0xFF8B8B8B);
+            graphics.centeredText(WaxedIconsConfigScreen.this.font, Component.translatable("preview.waxedicons.live"), this.getX() + this.width / 2, this.getY() - 4, 0xAAAAAA);
 
-            if (slotSize >= 16) {
-                context.getMatrices().pushMatrix();
-                float scale = slotSize / 16.0f;
-                context.getMatrices().scale(scale, scale);
-                context.drawItem(WaxedIconsConfigScreen.this.previewItem,
-                        (int)(slotX / scale), (int)(slotY / scale));
-                context.getMatrices().popMatrix();
-            }
-
-            if (this.iconTexture != null) {
-                int iconSize = Math.max(8, slotSize / 3);
-                int iconX = slotX + slotSize - iconSize;
-                context.drawTexture(RenderPipelines.GUI_TEXTURED, this.iconTexture, iconX, slotY, 0.0f, 0.0f,
-                        iconSize, iconSize, iconSize, iconSize);
-            }
+            graphics.fill(slotX - 2, slotY - 2, slotX + slotSize + 2, slotY + slotSize + 2, 0xFF2A2A2A);
+            graphics.fill(slotX, slotY, slotX + slotSize, slotY + slotSize, 0xFF8B8B8B);
+            
+            WaxedIconsConfigScreen.this.drawPreviewItem(graphics, slotX, slotY, slotSize);
+            WaxedIconsConfigScreen.this.drawIcon(graphics, selectedIconTexture(), slotX, slotY, slotSize);
         }
 
         @Override
-        public boolean mouseClicked(Click click, boolean doubled) {
-            if (this.isMouseOver(click.x(), click.y())) {
-                this.onClick.run();
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public SelectionType getType() {
-            return this.isFocused() ? SelectionType.FOCUSED : SelectionType.NONE;
-        }
-
-        @Override
-        protected void appendClickableNarrations(NarrationMessageBuilder builder) {
-
-        }
+        protected void updateWidgetNarration(NarrationElementOutput narration) {}
     }
 
-    public class ModernSliderWidget extends SliderWidget {
-        public ModernSliderWidget(int x, int y, int width, int height, Text message, double value) {
-            super(x, y, width, height, message, value);
+    private class OpacitySlider extends AbstractSliderButton {
+        public OpacitySlider(int x, int y, int width, int height, double value) {
+            super(x, y, width, height, Component.empty(), value);
+            this.updateMessage();
         }
 
         @Override
         protected void updateMessage() {
             int opacity = (int) Math.round(this.value * 100);
-            this.setMessage(Text.translatable("option.waxedicons.opacity", opacity + "%"));
+            this.setMessage(Component.translatable("option.waxedicons.opacity", opacity + "%"));
         }
 
         @Override
         protected void applyValue() {
             config.iconOpacity = (int) Math.round(this.value * 100);
-            updatePreviewOpacity();
-        }
-
-        @Override
-        protected void onDrag(Click click, double offsetX, double offsetY) {
-            super.onDrag(click, offsetX, offsetY);
-        }
-
-        @Override
-        public void onClick(Click click, boolean doubled) {
-            super.onClick(click, doubled);
-        }
-
-        @Override
-        public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-            int trackHeight = 4;
-            int trackY = this.getY() + (this.height - trackHeight) / 2;
-            context.fill(this.getX(), trackY, this.getX() + this.width, trackY + trackHeight, PANEL_COLOR);
-            // Draw track border
-            context.fill(this.getX(), trackY, this.getX() + this.width, trackY + 1, BORDER_COLOR);
-            context.fill(this.getX(), trackY + trackHeight - 1, this.getX() + this.width, trackY + trackHeight, BORDER_COLOR);
-            context.fill(this.getX(), trackY, this.getX() + 1, trackY + trackHeight, BORDER_COLOR);
-            context.fill(this.getX() + this.width - 1, trackY, this.getX() + this.width, trackY + trackHeight, BORDER_COLOR);
-
-            int fillWidth = (int) (this.value * this.width);
-            if (fillWidth > 0) {
-                context.fill(this.getX(), trackY, this.getX() + fillWidth, trackY + trackHeight, ACCENT_COLOR);
-            }
-
-            int handleWidth = 12;
-            int handleHeight = this.height;
-            int handleX = this.getX() + (int) (this.value * (this.width - handleWidth));
-
-            int handleColor = this.isHovered() ? 0xFFFFFFFF : ACCENT_COLOR;
-            context.fill(handleX, this.getY(), handleX + handleWidth, this.getY() + handleHeight, handleColor);
-
-            context.fill(handleX, this.getY(), handleX + handleWidth, this.getY() + 1, BORDER_COLOR);
-            context.fill(handleX, this.getY() + handleHeight - 1, handleX + handleWidth, this.getY() + handleHeight, BORDER_COLOR);
-            context.fill(handleX, this.getY(), handleX + 1, this.getY() + handleHeight, BORDER_COLOR);
-            context.fill(handleX + handleWidth - 1, this.getY(), handleX + handleWidth, this.getY() + handleHeight, BORDER_COLOR);
-
-            context.drawCenteredTextWithShadow(WaxedIconsConfigScreen.this.textRenderer,
-                    this.getMessage(), this.getX() + this.width / 2, this.getY() - 12, TEXT_COLOR);
         }
     }
 }
