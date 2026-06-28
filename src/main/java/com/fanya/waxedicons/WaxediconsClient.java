@@ -31,7 +31,7 @@ public class WaxediconsClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (configKeyBinding.consumeClick()) {
-                client.setScreen(createConfigScreen(client.screen));
+                client.gui.setScreen(createConfigScreen(client.gui.screen()));
             }
         });
 

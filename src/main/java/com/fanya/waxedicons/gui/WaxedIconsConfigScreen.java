@@ -71,7 +71,7 @@ public class WaxedIconsConfigScreen extends Screen {
         this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> this.saveAndClose())
                 .bounds(centerX - 155, buttonY, 150, 20)
                 .build());
-        this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), button -> this.minecraft.setScreen(this.parent))
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), button -> this.minecraft.gui.setScreen(this.parent))
                 .bounds(centerX + 5, buttonY, 150, 20)
                 .build());
     }
@@ -97,13 +97,13 @@ public class WaxedIconsConfigScreen extends Screen {
     private void saveAndClose() {
         this.config.validate();
         WaxedIconsConfigManager.saveConfig();
-        this.minecraft.setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
     }
 
     @Override
     public void onClose() {
         this.config.validate();
-        this.minecraft.setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
     }
 
     @Override
