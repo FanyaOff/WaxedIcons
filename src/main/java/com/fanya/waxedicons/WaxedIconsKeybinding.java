@@ -11,7 +11,7 @@ public class WaxedIconsKeybinding {
 
     public static final KeyMapping CONFIG_KEY = new KeyMapping(
             "key.waxedicons.config",
-            InputConstants.Type.KEYSYM,
+            InputConstants.Type.KEYBOARD,
             InputConstants.KEY_G,
             CONFIG_CATEGORY
     );
